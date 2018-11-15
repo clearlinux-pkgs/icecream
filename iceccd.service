@@ -6,6 +6,7 @@ After=network.target nss-lookup.target
 Type=simple
 Environment=ICECREAM_NETNAME=icecream
 EnvironmentFile=-/etc/icecream.conf
+RuntimeDirectory=icecc
 CacheDirectory=icecream
 ExecStart=/usr/bin/iceccd -v -b /var/cache/icecream/ -n $ICECREAM_NETNAME $ICECCD_PARAMS
 Nice=5

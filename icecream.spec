@@ -4,7 +4,7 @@
 #
 Name     : icecream
 Version  : 1.2
-Release  : 2
+Release  : 3
 URL      : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source0  : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source1  : iceccd.service
