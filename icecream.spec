@@ -4,7 +4,7 @@
 #
 Name     : icecream
 Version  : 1.2
-Release  : 1
+Release  : 2
 URL      : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source0  : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source1  : iceccd.service
@@ -79,12 +79,12 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1542174200
+export SOURCE_DATE_EPOCH=1542241689
 %autogen --disable-static --with-man=no
 make  %{?_smp_mflags}
 
 %install
-export SOURCE_DATE_EPOCH=1542174200
+export SOURCE_DATE_EPOCH=1542241689
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/icecream
 cp COPYING %{buildroot}/usr/share/package-licenses/icecream/COPYING
@@ -93,9 +93,9 @@ mkdir -p %{buildroot}/usr/lib/systemd/system
 install -m 0644 %{SOURCE1} %{buildroot}/usr/lib/systemd/system/iceccd.service
 install -m 0644 %{SOURCE2} %{buildroot}/usr/lib/systemd/system/icecream-scheduler.service
 ## install_append content
-set x86_64-generic-linux-c++ x86_64-generic-linux-gcc x86_64-generic-linux-g++
+set clang clang++ x86_64-generic-linux-c++ x86_64-generic-linux-gcc x86_64-generic-linux-g++
 for f; do
-ln -s /usr/bin/icecc %{buildroot}/usr/libexec/icecc/bin/$f
+ln -sf /usr/bin/icecc %{buildroot}/usr/libexec/icecc/bin/$f
 done
 ## install_append end
 

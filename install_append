@@ -1,0 +1,6 @@
+# Add a few more symlinks to compilers we have in Clear
+# (and ensure others exist)
+set clang clang++ x86_64-generic-linux-c++ x86_64-generic-linux-gcc x86_64-generic-linux-g++
+for f; do
+    ln -sf /usr/bin/icecc %{buildroot}/usr/libexec/icecc/bin/$f
+done
