@@ -4,7 +4,7 @@
 #
 Name     : icecream
 Version  : 1.2
-Release  : 3
+Release  : 4
 URL      : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source0  : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source1  : iceccd.service
@@ -18,6 +18,9 @@ Requires: icecream-license = %{version}-%{release}
 Requires: icecream-services = %{version}-%{release}
 BuildRequires : libcap-ng-dev
 BuildRequires : lzo-dev
+Patch1: 0001-Also-include-base-libraries-for-AVX2-and-AVX512-buil.patch
+Patch2: 0002-Fix-finding-ld.so.conf-on-Clear-Linux.patch
+Patch3: 0003-Fix-warning-printed-when-lib-or-lib64-are-symlinks.patch
 
 %description
 NOTE: Although icecream will compile on some non-Linux systems,
@@ -73,18 +76,21 @@ services components for the icecream package.
 
 %prep
 %setup -q -n icecream-1.2
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1542241689
+export SOURCE_DATE_EPOCH=1542662187
 %autogen --disable-static --with-man=no
 make  %{?_smp_mflags}
 
 %install
-export SOURCE_DATE_EPOCH=1542241689
+export SOURCE_DATE_EPOCH=1542662187
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/icecream
 cp COPYING %{buildroot}/usr/share/package-licenses/icecream/COPYING

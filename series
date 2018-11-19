@@ -1,0 +1,3 @@
+0001-Also-include-base-libraries-for-AVX2-and-AVX512-buil.patch
+0002-Fix-finding-ld.so.conf-on-Clear-Linux.patch
+0003-Fix-warning-printed-when-lib-or-lib64-are-symlinks.patch
