@@ -17,11 +17,18 @@ Requires: icecream-data = %{version}-%{release}
 Requires: icecream-libexec = %{version}-%{release}
 Requires: icecream-license = %{version}-%{release}
 Requires: icecream-services = %{version}-%{release}
+BuildRequires : automake
+BuildRequires : automake-dev
+BuildRequires : gettext-bin
 BuildRequires : libcap-ng-dev
+BuildRequires : libtool
+BuildRequires : libtool-dev
 BuildRequires : lzo-dev
-Patch1: 0001-Also-include-base-libraries-for-AVX2-and-AVX512-buil.patch
-Patch2: 0002-Fix-finding-ld.so.conf-on-Clear-Linux.patch
-Patch3: 0003-Fix-warning-printed-when-lib-or-lib64-are-symlinks.patch
+BuildRequires : m4
+BuildRequires : pkg-config-dev
+Patch1: 0001-Various-fixes-related-to-Clear-Linux-431.patch
+Patch2: 0002-Add-support-for-decompressing-more-tarballs.patch
+Patch3: 0003-Use-Linux-s-unshare-2-abilities-to-further-limit-wha.patch
 
 %description
 NOTE: Although icecream will compile on some non-Linux systems,

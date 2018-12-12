@@ -1,0 +1,80 @@
+From 91c1217bcd062a4b32a36727fce33d0f791d6ff9 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Wed, 12 Dec 2018 10:52:06 -0800
+Subject: [PATCH] Use Linux's unshare(2) abilities to further limit what
+ compilers can do
+
+It's the same principle as containers. We limit:
+- CLONE_NEWIPC (SysV IPC): accessing IPC in the system
+- CLONE_NEWNET (networking): network access (only loopback allowed)
+- CLONE_NEWNS (mount namespace): complements chroot
+- CLONE_NEWPID (PIDs): no ptrace(2) or kill(2) any other processes
+- CLONE_NEWUSER (users): no other processes share UID
+- CLONE_NEWUTS (UTS)
+
+As a side-effect of CLONE_NEWPID, when run, the compiler will see itself
+as PID 1.
+---
+ daemon/environment.cpp | 26 ++++++++++++++++++++++++++
+ configure.ac           |  1 +
+ 2 files changed, 27 insertions(+)
+
+diff --git a/daemon/environment.cpp b/daemon/environment.cpp
+index 23b784b..68825f7 100644
+--- a/daemon/environment.cpp
++++ b/daemon/environment.cpp
+@@ -33,6 +33,9 @@
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ #include <signal.h>
++#ifdef HAVE_SCHED_H
++#include <sched.h>
++#endif
+ 
+ #include "comm.h"
+ #include "exitcode.h"
+@@ -667,6 +670,29 @@ error_client(MsgChannel *client, string error)
+ 
+ void chdir_to_environment(MsgChannel *client, const string &dirname, uid_t user_uid, gid_t user_gid)
+ {
++#ifdef HAVE_UNSHARE
++    int flags = 0;
++#  ifdef CLONE_NEWIPC
++    flags |= CLONE_NEWIPC;
++#  endif
++#  ifdef CLONE_NEWNET
++    flags |= CLONE_NEWNET;
++#  endif
++#  ifdef CLONE_NEWNS
++    flags |= CLONE_NEWNS;    // mount namespace
++#  endif
++#  ifdef CLONE_NEWPID
++    flags |= CLONE_NEWPID;
++#  endif
++#  ifdef CLONE_NEWUSER
++    flags |= CLONE_NEWUSER;
++#  endif
++#  ifdef CLONE_NEWUTS
++    flags |= CLONE_NEWUTS;
++#  endif
++    (void) unshare(flags);
++#endif
++
+ #ifdef HAVE_LIBCAP_NG
+ 
+     if (chdir(dirname.c_str()) < 0) {
+diff --git a/configure.ac b/configure.ac
+index 00c3414..6ccceac 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -108,6 +108,7 @@ AC_CHECK_HEADERS([resolv.h], [], [],
+ # include <arpa/nameser.h>
+ #endif
+ ])
++AC_CHECK_HEADERS([sched.h], [AC_CHECK_FUNCS([unshare])])
+ 
+ AC_ARG_VAR(TAR, [Specifies tar path])
+ AC_PATH_PROG(TAR, [tar])
+-- 
+2.19.2
+
