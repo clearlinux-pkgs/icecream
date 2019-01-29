@@ -4,7 +4,7 @@
 #
 Name     : icecream
 Version  : 1.2
-Release  : 5
+Release  : 6
 URL      : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source0  : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source1  : iceccd.service
@@ -13,6 +13,7 @@ Summary  : icecc is a library for connecting to icecc schedulers
 Group    : Development/Tools
 License  : GPL-2.0
 Requires: icecream-bin = %{version}-%{release}
+Requires: icecream-data = %{version}-%{release}
 Requires: icecream-libexec = %{version}-%{release}
 Requires: icecream-license = %{version}-%{release}
 Requires: icecream-services = %{version}-%{release}
@@ -31,6 +32,7 @@ form of process accounting in there.
 %package bin
 Summary: bin components for the icecream package.
 Group: Binaries
+Requires: icecream-data = %{version}-%{release}
 Requires: icecream-libexec = %{version}-%{release}
 Requires: icecream-license = %{version}-%{release}
 Requires: icecream-services = %{version}-%{release}
@@ -39,10 +41,19 @@ Requires: icecream-services = %{version}-%{release}
 bin components for the icecream package.
 
 
+%package data
+Summary: data components for the icecream package.
+Group: Data
+
+%description data
+data components for the icecream package.
+
+
 %package dev
 Summary: dev components for the icecream package.
 Group: Development
 Requires: icecream-bin = %{version}-%{release}
+Requires: icecream-data = %{version}-%{release}
 Provides: icecream-devel = %{version}-%{release}
 
 %description dev
@@ -85,12 +96,12 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1542662187
+export SOURCE_DATE_EPOCH=1548801215
 %autogen --disable-static --with-man=no
 make  %{?_smp_mflags}
 
 %install
-export SOURCE_DATE_EPOCH=1542662187
+export SOURCE_DATE_EPOCH=1548801215
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/icecream
 cp COPYING %{buildroot}/usr/share/package-licenses/icecream/COPYING
@@ -103,6 +114,16 @@ set clang clang++ x86_64-generic-linux-c++ x86_64-generic-linux-gcc x86_64-gener
 for f; do
 ln -sf /usr/bin/icecc %{buildroot}/usr/libexec/icecc/bin/$f
 done
+mkdir -p %{buildroot}/usr/share/defaults/etc/profile.d
+cat > %{buildroot}/usr/share/defaults/etc/profile.d/30-icecream.sh << "EOF"
+case ":${PATH:-}:" in
+*:/usr/libexec/icecc/bin:*) ;;
+*) PATH="/usr/libexec/icecc/bin${PATH:+:$PATH}" ;;
+esac
+if [ -z "$ICECC" ]; then
+ICECC=disable
+fi
+EOF
 ## install_append end
 
 %files
@@ -116,6 +137,10 @@ done
 /usr/bin/icecc-test-env
 /usr/bin/iceccd
 /usr/bin/icerun
+
+%files data
+%defattr(-,root,root,-)
+/usr/share/defaults/etc/profile.d/30-icecream.sh
 
 %files dev
 %defattr(-,root,root,-)
