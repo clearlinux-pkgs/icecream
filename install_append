@@ -1,18 +1,7 @@
+#!rpm
 # Add a few more symlinks to compilers we have in Clear
 # (and ensure others exist)
 set clang clang++ x86_64-generic-linux-c++ x86_64-generic-linux-gcc x86_64-generic-linux-g++
 for f; do
     ln -sf /usr/bin/icecc %{buildroot}/usr/libexec/icecc/bin/$f
 done
-
-mkdir -p %{buildroot}/usr/share/defaults/etc/profile.d
-cat > %{buildroot}/usr/share/defaults/etc/profile.d/30-icecream.sh << "EOF"
-# Install icecc in PATH, but disable it by default
-case ":${PATH:-}:" in
-    *:/usr/libexec/icecc/bin:*) ;;
-    *) PATH="/usr/libexec/icecc/bin${PATH:+:$PATH}" ;;
-esac
-if [ -z "$ICECC" ]; then
-    ICECC=disable
-fi
-EOF

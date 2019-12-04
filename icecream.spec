@@ -4,11 +4,12 @@
 #
 Name     : icecream
 Version  : 1.2
-Release  : 6
+Release  : 7
 URL      : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source0  : https://github.com/icecc/icecream/archive/1.2/icecream-1.2.tar.gz
 Source1  : iceccd.service
 Source2  : icecream-scheduler.service
+Source3  : icecream.sh
 Summary  : icecc is a library for connecting to icecc schedulers
 Group    : Development/Tools
 License  : GPL-2.0
@@ -62,6 +63,7 @@ Group: Development
 Requires: icecream-bin = %{version}-%{release}
 Requires: icecream-data = %{version}-%{release}
 Provides: icecream-devel = %{version}-%{release}
+Requires: icecream = %{version}-%{release}
 
 %description dev
 dev components for the icecream package.
@@ -94,6 +96,7 @@ services components for the icecream package.
 
 %prep
 %setup -q -n icecream-1.2
+cd %{_builddir}/icecream-1.2
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -102,35 +105,34 @@ services components for the icecream package.
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1548801215
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1575419575
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$CFLAGS -fno-lto "
+export FFLAGS="$CFLAGS -fno-lto "
+export CXXFLAGS="$CXXFLAGS -fno-lto "
 %autogen --disable-static --with-man=no
 make  %{?_smp_mflags}
 
 %install
-export SOURCE_DATE_EPOCH=1548801215
+export SOURCE_DATE_EPOCH=1575419575
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/icecream
-cp COPYING %{buildroot}/usr/share/package-licenses/icecream/COPYING
+cp %{_builddir}/icecream-1.2/COPYING %{buildroot}/usr/share/package-licenses/icecream/4cc77b90af91e615a64ae04893fdffa7939db84c
 %make_install
 mkdir -p %{buildroot}/usr/lib/systemd/system
 install -m 0644 %{SOURCE1} %{buildroot}/usr/lib/systemd/system/iceccd.service
 install -m 0644 %{SOURCE2} %{buildroot}/usr/lib/systemd/system/icecream-scheduler.service
+mkdir -p %{buildroot}/usr/share/defaults/etc/profile.d
+install -m755 %{_sourcedir}/icecream.sh %{buildroot}/usr/share/defaults/etc/profile.d/30-icecream.sh
 ## install_append content
+# Add a few more symlinks to compilers we have in Clear
+# (and ensure others exist)
 set clang clang++ x86_64-generic-linux-c++ x86_64-generic-linux-gcc x86_64-generic-linux-g++
 for f; do
 ln -sf /usr/bin/icecc %{buildroot}/usr/libexec/icecc/bin/$f
 done
-mkdir -p %{buildroot}/usr/share/defaults/etc/profile.d
-cat > %{buildroot}/usr/share/defaults/etc/profile.d/30-icecream.sh << "EOF"
-case ":${PATH:-}:" in
-*:/usr/libexec/icecc/bin:*) ;;
-*) PATH="/usr/libexec/icecc/bin${PATH:+:$PATH}" ;;
-esac
-if [ -z "$ICECC" ]; then
-ICECC=disable
-fi
-EOF
 ## install_append end
 
 %files
@@ -172,7 +174,7 @@ EOF
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/icecream/COPYING
+/usr/share/package-licenses/icecream/4cc77b90af91e615a64ae04893fdffa7939db84c
 
 %files services
 %defattr(-,root,root,-)
