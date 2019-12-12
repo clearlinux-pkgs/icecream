@@ -1,4 +1,5 @@
 Configure miss: if GCC is actually Clang
+Configure miss: whether to enable debug module
 Configure miss: kinfo.h usability
 Configure miss: kinfo.h presence
 Configure miss: kinfo.h
@@ -9,5 +10,8 @@ Configure miss: mach/host_info.h usability
 Configure miss: mach/host_info.h presence
 Configure miss: mach/host_info.h
 Configure miss: netinet/tcp_var.h
+Configure miss: archive.h, usability
+Configure miss: archive.h, presence
+Configure miss: archive.h,
 Configure miss: clang -E -frewrite-includes
 Configure miss: -fsanitize= usage
