@@ -4,7 +4,7 @@
 #
 Name     : icecream
 Version  : 1.4
-Release  : 10
+Release  : 11
 URL      : https://github.com/icecc/icecream/releases/download/1.4/icecc-1.4.0.tar.xz
 Source0  : https://github.com/icecc/icecream/releases/download/1.4/icecc-1.4.0.tar.xz
 Source1  : iceccd.service
@@ -22,6 +22,7 @@ BuildRequires : lzo-dev
 BuildRequires : pkgconfig(libarchive)
 BuildRequires : pkgconfig(libcap-ng)
 BuildRequires : pkgconfig(libzstd)
+Patch1: 0001-Update-icecc-create-env-to-support-glibc-hwcaps.patch
 
 %description
 NOTE: Although icecream will compile on some non-Linux systems,
@@ -89,13 +90,14 @@ services components for the icecream package.
 %prep
 %setup -q -n icecc-1.4.0
 cd %{_builddir}/icecc-1.4.0
+%patch1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1650663365
+export SOURCE_DATE_EPOCH=1651516003
 export GCC_IGNORE_WERROR=1
 export CFLAGS="$CFLAGS -fno-lto "
 export FCFLAGS="$FFLAGS -fno-lto "
@@ -105,7 +107,7 @@ export CXXFLAGS="$CXXFLAGS -fno-lto "
 make  %{?_smp_mflags}
 
 %install
-export SOURCE_DATE_EPOCH=1650663365
+export SOURCE_DATE_EPOCH=1651516003
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/icecream
 cp %{_builddir}/icecc-1.4.0/COPYING %{buildroot}/usr/share/package-licenses/icecream/4cc77b90af91e615a64ae04893fdffa7939db84c
